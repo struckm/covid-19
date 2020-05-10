@@ -4,33 +4,65 @@ import './covid.css';
 class Covid extends Component {
     constructor(props, context) {
         super(props);
-        this.getLTCData = this.getLTCData.bind(this);
-        this.test = 'testing 123....';
+
+        this.state = {
+            facilities: [],
+            lastUpdateDate: null 
+        }
     }
 
-    async getLTCData() {
-        // make a call to the backend to retrieve the LTC data
-        let url = 'http://localhost:5000/';
-
-        await fetch(url,
-            {
-                method:'GET',
-                mode: 'no-cors',
-                headers: {
-                    'Content-Type': 'application/json'
+    componentDidMount() {
+        this.getLTCData()
+            .then((resp) => {
+                if(resp.ok) {
+                    return resp.json();
+                } else {
+                    throw new Error('Error retrieving data from server');
                 }
             })
-            .then( response => {
-                console.log(response.json());
+            .then((json) => {
+                console.log(json);
+                this.setState({
+                    lastUpdateDate: json.LastUpdateDate
+                });
+            })
+            .catch((error) => {
+                console.log(error);
             });
     }
 
-    render() {
-        console.log(this.getLTCData());        
+    getLTCData() {
+        // make a call to the backend to retrieve the LTC data
+        const url = 'http://localhost:5000/';
 
+        // const options = {
+        //     method:'GET',
+        //     mode: 'no-cors',
+        //     headers: {
+        //         'Content-Type': 'application/json'
+        //     }
+        // };
+
+        return fetch(url);
+    }
+
+    render() {
+        let { lastUpdateDate } = this.state;
+
+        let updateDate = null;
+        if(lastUpdateDate) {
+            updateDate = `${lastUpdateDate.month}/${lastUpdateDate.day}/${lastUpdateDate.year}`;
+        }
         return (
             <div>
-                This is the {this.test} component
+                <div>
+                    COVID-19 LTC Stats
+                </div>
+                { updateDate && 
+                <div>
+                    Last Update Date: {updateDate}
+                </div>
+                }
             </div>
         );
     }
