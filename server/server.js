@@ -89,3 +89,17 @@ app.listen(5000, () => console.log('app listening on port 5000'));
 
 // Write this code using promises as well as using async await
 
+
+
+//
+// Promises
+//
+
+// Promises syntax
+//
+
+
+
+//
+// async await
+//
