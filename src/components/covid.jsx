@@ -6,8 +6,8 @@ class Covid extends Component {
         super(props);
 
         this.state = {
-            facilities: [],
-            lastUpdateDate: null 
+            ltc: null,
+            state: null
         }
     }
 
@@ -23,7 +23,8 @@ class Covid extends Component {
             .then((json) => {
                 console.log(json);
                 this.setState({
-                    lastUpdateDate: json.LastUpdateDate
+                    ltc: json.ltc,
+                    state: json.state
                 });
             })
             .catch((error) => {
@@ -47,22 +48,45 @@ class Covid extends Component {
     }
 
     render() {
-        let { lastUpdateDate } = this.state;
+        let { ltc, state } = this.state;
+        let ltcUpdateDate = null;
+        let stateUpdateDate = null;
+        let ltcDeaths = null;
+        let stateDeaths = null;
 
-        let updateDate = null;
-        if(lastUpdateDate) {
-            updateDate = `${lastUpdateDate.month}/${lastUpdateDate.day}/${lastUpdateDate.year}`;
+        if(ltc) {
+            ltcUpdateDate = `${ltc.LastUpdateDate.month}/${ltc.LastUpdateDate.day}/${ltc.LastUpdateDate.year}`;
+            ltcDeaths = ltc.FacilityValues.reduce((sum, facility) => sum += facility.deaths, 0);
         }
+
+        if(state) {
+            stateUpdateDate = `${state.LastUpdateDate.month}/${state.LastUpdateDate.day}/${state.LastUpdateDate.year}`;
+            stateDeaths = state.state_testing_results.values[state.state_testing_results.values.length - 1].deaths;
+        }
+
         return (
             <div>
-                <div>
-                    COVID-19 LTC Stats
-                </div>
-                { updateDate && 
-                <div>
-                    Last Update Date: {updateDate}
-                </div>
-                }
+                <h1>
+                    COVID-19 Stats
+                </h1>
+                <section>
+                    <h1>State Data</h1>
+                    { stateDeaths &&
+                        <span>Deaths: {stateDeaths}  </span>
+                    }
+                    { stateUpdateDate &&
+                        <span>Last Update Date: {stateUpdateDate}</span>
+                    }
+                </section>               
+                <section>
+                    <h1>Long Term Care Stats</h1>
+                    { ltcDeaths &&
+                        <span>Deaths: {ltcDeaths}  </span>
+                    }
+                    { ltcUpdateDate && 
+                        <span>Last Update Date: {ltcUpdateDate}</span>
+                    }
+                </section>
             </div>
         );
     }
