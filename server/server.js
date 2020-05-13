@@ -6,6 +6,8 @@ const https = require('https');
 const ltc_url = 'https://www.dph.illinois.gov/sitefiles/COVIDLTC.json?nocache=1';
 const state_url = 'https://www.dph.illinois.gov/sitefiles/COVIDTestResults.json?nocache=1';
 const cdc_url = 'https://data.cdc.gov/resource/r8kw-7aab.json';
+const hosp_url = 'https://www.dph.illinois.gov/sitefiles/COVIDHospitalRegions.json?nocache=1';
+
 
 app.use((req, res, next) => {
     res.header('Access-Control-Allow-Origin', '*');
@@ -17,11 +19,13 @@ app.get('/', async (req, res) => {
     let ltc_data = await get_data(ltc_url);
     let state_data = await get_data(state_url);
     let cdc_data = await get_data(cdc_url);
+    let hosp_data = await get_data(hosp_url);
 
     let response = {
         ltc: ltc_data,
         state: state_data,
-        cdc: cdc_data
+        cdc: cdc_data,
+        hosp: hosp_data
     };
 
     res.send(response);

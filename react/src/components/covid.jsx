@@ -6,8 +6,7 @@ class Covid extends Component {
         super(props);
 
         this.state = {
-            ltc: null,
-            state: null
+            results: null
         }
     }
 
@@ -21,10 +20,9 @@ class Covid extends Component {
                 }
             })
             .then((json) => {
-                console.log(json);
+                // console.log(json);
                 this.setState({
-                    ltc: json.ltc,
-                    state: json.state
+                    results: json
                 });
             })
             .catch((error) => {
@@ -48,20 +46,53 @@ class Covid extends Component {
     }
 
     render() {
-        let { ltc, state } = this.state;
+        let { results } = this.state;
         let ltcUpdateDate = null;
         let stateUpdateDate = null;
         let ltcDeaths = null;
         let stateDeaths = null;
+        let stateDeathsByDate = null;
+        let perDeathsByLTC = null;
+        let testResults = [];
 
-        if(ltc) {
+        if(results) {
+            let ltc = results.ltc;
+            let state = results.state;
+            // let cdc = results.cdc;
+            // let hosp = results.hosp;
+    
             ltcUpdateDate = `${ltc.LastUpdateDate.month}/${ltc.LastUpdateDate.day}/${ltc.LastUpdateDate.year}`;
             ltcDeaths = ltc.FacilityValues.reduce((sum, facility) => sum += facility.deaths, 0);
-        }
 
-        if(state) {
             stateUpdateDate = `${state.LastUpdateDate.month}/${state.LastUpdateDate.day}/${state.LastUpdateDate.year}`;
             stateDeaths = state.state_testing_results.values[state.state_testing_results.values.length - 1].deaths;
+            stateDeathsByDate = state.state_testing_results.values.find((item) => item.testDate === ltcUpdateDate);
+            stateDeathsByDate = stateDeathsByDate.deaths;
+
+            perDeathsByLTC = (ltcDeaths/stateDeathsByDate)*100;
+            perDeathsByLTC = new Intl.NumberFormat('en-US', {maximumSignificantDigits: 4}).format(perDeathsByLTC);
+
+            for(let i=0; i < results.state.state_testing_results.values.length; i++){
+                let todaysResults = results.state.state_testing_results.values[i];
+                let priorResults = null;
+                if(i === 0) {
+                    testResults.push(todaysResults);                    
+                } else {
+                    // total_tested, confirmed_cases, deaths
+                    priorResults = results.state.state_testing_results.values[i-1];
+                    let result = {
+                        testDate: todaysResults.testDate,
+                        total_tested: todaysResults.total_tested - priorResults.total_tested,
+                        confirmed_cases: todaysResults.confirmed_cases - priorResults.confirmed_cases,
+                        deaths: todaysResults.deaths - priorResults.deaths
+                    };
+                    result.percentagePos = (result.confirmed_cases/result.total_tested)*100;
+                    result.percentagePos = new Intl.NumberFormat('en-US', {maximumSignificantDigits: 4}).format(result.percentagePos);
+                    testResults.push(result);
+                }
+            }
+            console.log(testResults);
+            console.log(results.state);
         }
 
         return (
@@ -72,7 +103,17 @@ class Covid extends Component {
                 <section>
                     <h1>State Data</h1>
                     { stateDeaths &&
-                        <span>Deaths: {stateDeaths}  </span>
+                        <div>
+                            <p>
+                                Deaths: {stateDeaths}
+                            </p>
+                            <p>
+                                Deaths on LTC Date: {stateDeathsByDate}
+                            </p>
+                            <p>
+                                Percentage of deaths in LTC: {perDeathsByLTC}%
+                            </p>
+                        </div>
                     }
                     { stateUpdateDate &&
                         <span>Last Update Date: {stateUpdateDate}</span>
@@ -80,12 +121,14 @@ class Covid extends Component {
                 </section>               
                 <section>
                     <h1>Long Term Care Stats</h1>
+                    <div>
                     { ltcDeaths &&
-                        <span>Deaths: {ltcDeaths}  </span>
+                        <p>Deaths: {ltcDeaths}</p>
                     }
                     { ltcUpdateDate && 
-                        <span>Last Update Date: {ltcUpdateDate}</span>
+                        <p>Last Update Date: {ltcUpdateDate}</p>
                     }
+                    </div>
                 </section>
             </div>
         );
