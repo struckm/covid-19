@@ -91,8 +91,11 @@ class Covid extends Component {
                     testResults.push(result);
                 }
             }
-            console.log(testResults);
-            console.log(results.state);
+            // console.log(testResults);
+            // console.log(results.state);
+            console.log(results.cdc);
+            let cdc_illinois = results.cdc.filter(item => item.state === 'Illinois');
+            console.log(cdc_illinois);
         }
 
         return (
