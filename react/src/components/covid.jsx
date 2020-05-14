@@ -1,6 +1,8 @@
 import React, { Component } from 'react';
 import './covid.css';
 
+import { VictoryBar } from 'victory';
+
 class Covid extends Component {
     constructor(props, context) {
         super(props);
@@ -91,11 +93,11 @@ class Covid extends Component {
                     testResults.push(result);
                 }
             }
-            // console.log(testResults);
+            console.log(testResults);
             // console.log(results.state);
-            console.log(results.cdc);
+            // console.log(results.cdc);
             let cdc_illinois = results.cdc.filter(item => item.state === 'Illinois');
-            console.log(cdc_illinois);
+            // console.log(cdc_illinois);
         }
 
         return (
@@ -121,7 +123,7 @@ class Covid extends Component {
                     { stateUpdateDate &&
                         <span>Last Update Date: {stateUpdateDate}</span>
                     }
-                </section>               
+                </section>
                 <section>
                     <h1>Long Term Care Stats</h1>
                     <div>
@@ -133,6 +135,7 @@ class Covid extends Component {
                     }
                     </div>
                 </section>
+                <VictoryBar />
             </div>
         );
     }

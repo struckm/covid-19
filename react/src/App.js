@@ -1,7 +1,7 @@
 import React from 'react';
 import './App.css';
+import * as V from 'victory';
 
-// import a component from react
 import Covid from './components/covid';
 
 function App() {
