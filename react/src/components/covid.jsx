@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import './covid.css';
 
-import { VictoryBar } from 'victory';
+import { 
+    VictoryBar, 
+    VictoryChart, 
+    VictoryAxis,
+    VictoryTheme
+ } from 'victory';
 
 class Covid extends Component {
     constructor(props, context) {
@@ -57,6 +62,8 @@ class Covid extends Component {
         let perDeathsByLTC = null;
         let testResults = [];
 
+        let tickFormats = null;
+
         if(results) {
             let ltc = results.ltc;
             let state = results.state;
@@ -92,11 +99,12 @@ class Covid extends Component {
                     result.percentagePos = new Intl.NumberFormat('en-US', {maximumSignificantDigits: 4}).format(result.percentagePos);
                     testResults.push(result);
                 }
+                tickFormats = testResults.map(item => item.testDate).splice;
             }
-            console.log(testResults);
+            // console.log(testResults);
             // console.log(results.state);
             // console.log(results.cdc);
-            let cdc_illinois = results.cdc.filter(item => item.state === 'Illinois');
+            // let cdc_illinois = results.cdc.filter(item => item.state === 'Illinois');
             // console.log(cdc_illinois);
         }
 
@@ -135,7 +143,17 @@ class Covid extends Component {
                     }
                     </div>
                 </section>
-                <VictoryBar />
+                <VictoryChart
+                    domainpadding={20}
+                >
+                    <VictoryAxis
+                        tickValues={tickFormats}
+                        tickFormat={tickFormats}
+                    >
+
+                    </VictoryAxis>
+                </VictoryChart>
+
             </div>
         );
     }
